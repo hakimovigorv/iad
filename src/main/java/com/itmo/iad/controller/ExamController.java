@@ -1,53 +1,53 @@
 package com.itmo.iad.controller;
 
-import com.itmo.iad.exeption.AuthException;
 import com.itmo.iad.model.Answer;
 import com.itmo.iad.model.Task;
+import com.itmo.iad.model.exam.ExamTask;
 import com.itmo.iad.payload.JwtAuthentication;
 import com.itmo.iad.payload.request.AnswerRequest;
+import com.itmo.iad.payload.request.ExamAnswerRequest;
+import com.itmo.iad.payload.request.TaskAnswerPair;
 import com.itmo.iad.payload.response.MessageResponse;
-import com.itmo.iad.service.AnswerService;
-import com.itmo.iad.service.AuthService;
-import com.itmo.iad.service.TaskService;
-import com.itmo.iad.service.UserService;
+import com.itmo.iad.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/task")
+@RequestMapping("api/exam")
 @RequiredArgsConstructor
-public class TaskController {
+public class ExamController {
     @Autowired
-    private TaskService taskService;
-    @Autowired
-    private AnswerService answerService;
+    private ExamService examService;
     @Autowired
     private UserService userService;
     @Autowired
     private AuthService authService;
 
-    @PreAuthorize("hasAuthority('CERTIFIED')")
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("all")
-    public List<Task> getTasks() {
-        return taskService.findAll().stream()
+    public List<ExamTask> getTasks() {
+        return examService.findAll().stream()
                 .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAuthority('CERTIFIED')")
+    @PreAuthorize("hasAuthority('USER')")
     @PostMapping("answer")
-    public ResponseEntity<?> acceptAnswer(@RequestBody AnswerRequest answerRequest) {
+    public boolean acceptAnswer(@RequestBody ExamAnswerRequest examAnswerRequest) {
         final JwtAuthentication authInfo = authService.getAuthInfo();
 
-        answerService.save(Answer.builder()
-                        .userId(userService.getByLogin(answerRequest.getUser()).get().getId())
-                        .value(answerRequest.getValue())
-                .build());
-        return ResponseEntity.ok(new MessageResponse("Answer accepted"));
+        if(examService.acceptAnswer(examAnswerRequest.getAnswers().stream()
+                        .collect(Collectors.toMap(TaskAnswerPair::getTaskId, TaskAnswerPair::getAnswer))))
+        {
+            userService.setCertified(examAnswerRequest.getUser());
+            return true;
+        }
+        return false;
     }
 }

@@ -59,6 +59,7 @@ public class AuthController {
                 .password(signUpRequest.getPassword())
                 .firstName(signUpRequest.getFirstName())
                 .lastName(signUpRequest.getLastName())
+                .certified(false)
                 .build()))
         );
     }

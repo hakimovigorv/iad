@@ -48,4 +48,12 @@ public class UserService {
         return "User registered successfully!";
     }
 
+    public void setCertified(String username){
+        User user = userRepository.findByLogin(username).get();
+        Role role = roleRepository.findByName(ERole.CERTIFIED)
+               .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        user.getRoles().add(role);
+        userRepository.save(user);
+    }
+
 }

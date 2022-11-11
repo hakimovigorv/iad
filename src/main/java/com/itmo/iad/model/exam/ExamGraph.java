@@ -1,7 +1,7 @@
-package com.itmo.iad.model;
-
+package com.itmo.iad.model.exam;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.itmo.iad.model.Task;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,8 +13,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "graphs")
-public class Graph {
+@Table(name = "exam_graphs")
+public class ExamGraph {
     @Id
     @Column(name = "id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Graph {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "task_id")
-    private Task task;
+    @JoinColumn(name = "exam_task_id")
+    private ExamTask examTask;
 
 }

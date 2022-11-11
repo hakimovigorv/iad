@@ -32,4 +32,5 @@ public class News {
     @JsonIgnore
     @JoinColumn(name = "task_id")
     private Task task;
+
 }

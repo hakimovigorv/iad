@@ -25,6 +25,8 @@ public class User {
     private String firstName;
     private String lastName;
 
+    private boolean certified;
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

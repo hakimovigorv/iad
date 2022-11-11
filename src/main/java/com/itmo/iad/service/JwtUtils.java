@@ -7,8 +7,7 @@ import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,8 +22,14 @@ public final class JwtUtils {
     }
 
     private static Set<ERole> getRoles(Claims claims) {
-        final List<String> roles = claims.get("roles", List.class);
-        return roles.stream()
+        final List<Map> roles = claims.get("roles", List.class);
+        List<String> rolesList= new ArrayList<>();
+        for (Map role: roles)
+        {
+            rolesList.add(role.get("name").toString());
+        }
+
+        return rolesList.stream()
                 .map(ERole::valueOf)
                 .collect(Collectors.toSet());
     }
